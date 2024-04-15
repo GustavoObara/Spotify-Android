@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.SpotifyAndroid" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+         <item name="colorPrimary">#1DB954</item>
     </style>
 
     <style name="Theme.SpotifyAndroid" parent="Base.Theme.SpotifyAndroid" />
