@@ -1,7 +1,8 @@
-package com.spotify.Activity;
+package com.spotify.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -62,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void connected() {
-        mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL");
+        mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:6Q1RJd3jLkIktYlCGuFwA9?si=ee08e8d693f74994");
 
         mSpotifyAppRemote.getPlayerApi()
                 .subscribeToPlayerState()
@@ -72,5 +73,8 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("MainActivity", track.name + " by " + track.artist.name);
                     }
                 });
+
+        Intent intent = new Intent(this, PlayerActivity.class);
+        startActivity(intent);
     }
 }
