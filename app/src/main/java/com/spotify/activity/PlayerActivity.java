@@ -8,32 +8,26 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.spotify.R;
-import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.protocol.types.Track;
+import com.spotify.callback.StringCallback;
+import com.spotify.service.PlayerService;
+import com.spotify.service.PlayerServiceImpl;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class PlayerActivity extends AppCompatActivity {
-
-    private static final String CLIENT_ID = "9b29ba638ee846a2b3d5784dabc922f5";
-    private static final String REDIRECT_URI = "http://localhost:8080";
-
     private boolean isPlaying = true;
-    private SpotifyAppRemote mSpotifyAppRemote;
+    private PlayerService playerService;
     private ImageView imageTrack;
-
     private TextView textTrack;
-
-    FloatingActionButton buttonPrevious, buttonPlayPause, buttonSkip;
+    private FloatingActionButton buttonPrevious, buttonPlayPause, buttonSkip;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,83 +41,55 @@ public class PlayerActivity extends AppCompatActivity {
         imageTrack = (ImageView) findViewById(R.id.imageTrack);
 
         start();
-
     }
 
     public void start() {
-        ConnectionParams connectionParams =
-                new ConnectionParams.Builder(CLIENT_ID)
-                        .setRedirectUri(REDIRECT_URI)
-                        .showAuthView(true)
-                        .build();
+        SpotifyAppRemote.connect(this, LoginActivity.connectionParams,
+            new Connector.ConnectionListener() {
+                public void onConnected(SpotifyAppRemote spotifyAppRemote) {
+                    playerService = new PlayerServiceImpl(spotifyAppRemote);
 
-        SpotifyAppRemote.connect(this, connectionParams,
-                new Connector.ConnectionListener() {
+                    playerService.play("spotify:playlist:6xICZD48qrN2bVbX9Yms9F?si=01869bf4ed2d4171");
 
-                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-                        mSpotifyAppRemote = spotifyAppRemote;
+                    urlToImage(imageTrack);
+                    trackToTextView(textTrack);
+                    switchImageButton(isPlaying);
 
-                        // Now you can start interacting with App Remote
-                        urlToImage(imageTrack);
-
-                        buttonSkip.setOnClickListener(v -> {
-                            skipToNext(v);
-                        });
-
-                        buttonPrevious.setOnClickListener(v -> {
-                            skipToPrevious(v);
-                        });
-
-                        buttonPlayPause.setOnClickListener(v -> {
-                            playPauseTrack(v);
-                        });
-                    }
-
-                    public void onFailure(Throwable throwable) {
-                        Log.e("MyActivity", throwable.getMessage(), throwable);
-
-                        // Something went wrong when attempting to connect! Handle errors here
-                    }
-                });
-    }
-
-    public void skipToNext(View view){
-        mSpotifyAppRemote.getPlayerApi().skipNext();
-    }
-
-    public void skipToPrevious(View view){
-        mSpotifyAppRemote.getPlayerApi().skipPrevious();
-    }
-
-    public void playPauseTrack(View view){
-        if(isPlaying){
-            mSpotifyAppRemote.getPlayerApi().pause();
-            buttonPlayPause.setImageResource(android.R.drawable.ic_media_play);
-        } else {
-            mSpotifyAppRemote.getPlayerApi()
-                    .subscribeToPlayerState()
-                    .setEventCallback(playerState -> {
-                        final Track track = playerState.track;
-                        mSpotifyAppRemote.getPlayerApi().play(track.uri);
+                    buttonSkip.setOnClickListener(v -> {
+                        playerService.skipToNext();
+                        switchImageButton(isPlaying = true);
                     });
-            buttonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
-        }
-        isPlaying = !isPlaying;
+                    buttonPrevious.setOnClickListener(v -> {
+                        playerService.skipToPrevious();
+                        switchImageButton(isPlaying = true);
+                    });
+                    buttonPlayPause.setOnClickListener(v -> {
+                        switchImageButton(isPlaying = playerService.playPause(isPlaying));
+                    });
+                }
+                public void onFailure(Throwable throwable) {
+                    Log.e("MyActivity", throwable.getMessage(), throwable);
+                }
+            });
     }
 
-    private void urlToImage(ImageView imageTrack){
-        mSpotifyAppRemote.getPlayerApi()
-                .subscribeToPlayerState()
-                .setEventCallback(playerState -> {
-                    final Track track = playerState.track;
-                    if (track != null) {
-                        String trackName = String.valueOf(track.name);
-                        textTrack.setText(trackName);
-                        String imageUri = String.valueOf(track.imageUri);
-                        imageUri = extractImageUrl(imageUri);
-                        downloadImage(imageUri, imageTrack);
-                    }
-                });
+    private void trackToTextView(TextView textTrack) {
+        playerService.getNameTrack(new StringCallback() {
+            @Override
+            public void onStringReceived(String nameTrack) {
+                textTrack.setText(nameTrack);
+            }
+        });
+    }
+
+    private void urlToImage(ImageView imageView){
+        playerService.getImage(new StringCallback() {
+            @Override
+            public void onStringReceived(String imageUri) {
+                String image = extractImageUrl(imageUri);
+                downloadImage(image, imageView);
+            }
+        });
     }
 
     private String extractImageUrl(String imageUri){
@@ -148,4 +114,13 @@ public class PlayerActivity extends AppCompatActivity {
             }
         }).start();
     }
+
+    private void switchImageButton(boolean isPlaying) {
+        if (isPlaying){
+            buttonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
+        }else {
+            buttonPlayPause.setImageResource(android.R.drawable.ic_media_play);
+        }
+    }
+
 }
