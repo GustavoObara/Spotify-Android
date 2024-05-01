@@ -29,12 +29,14 @@
         android:id="@+id/buttonSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="60dp"
         android:layout_marginBottom="75dp"
         android:clickable="true"
+        app:backgroundTint="#AAAAAA"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonRepeat"
+        app:layout_constraintStart_toEndOf="@+id/buttonPlayPause"
         app:srcCompat="@android:drawable/ic_media_next"
+        app:tint="#000000"
         app:useCompatPadding="false" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -43,19 +45,83 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="75dp"
         android:clickable="true"
+        app:backgroundTint="#AAAAAA"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSkip"
-        app:layout_constraintStart_toEndOf="@+id/buttonPrevious"
-        app:srcCompat="@android:drawable/ic_media_pause" />
+        app:layout_constraintEnd_toStartOf="@+id/buttonRepeat"
+        app:layout_constraintStart_toEndOf="@+id/buttonRandom"
+        app:srcCompat="@android:drawable/ic_media_pause"
+        app:tint="#000000" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonPrevious"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
         android:layout_marginBottom="75dp"
         android:clickable="true"
+        app:backgroundTint="#AAAAAA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonPlayPause"
+        app:layout_constraintStart_toEndOf="@+id/buttonRandom"
+        app:srcCompat="@android:drawable/ic_media_previous"
+        app:tint="#000000" />
+
+    <SeekBar
+        android:id="@+id/seekBarMusic"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageTrack"
+        app:layout_constraintStart_toStartOf="@+id/textArtist"
+        app:layout_constraintTop_toBottomOf="@+id/textArtist" />
+
+    <TextView
+        android:id="@+id/textArtist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/textTrack"
+        app:layout_constraintTop_toBottomOf="@+id/textTrack" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonRepeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="75dp"
+        android:clickable="true"
+        app:backgroundTint="#AAAAAA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_popup_sync"
+        app:tint="#000000" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonRandom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="75dp"
+        android:clickable="true"
+        app:backgroundTint="#AAAAAA"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/ic_media_previous" />
+        app:srcCompat="@android:drawable/ic_menu_help"
+        app:tint="#000000" />
+
+    <TextView
+        android:id="@+id/textDurationState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        app:layout_constraintStart_toStartOf="@+id/seekBarMusic"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarMusic" />
+
+    <TextView
+        android:id="@+id/textDurationMax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/seekBarMusic"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarMusic" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

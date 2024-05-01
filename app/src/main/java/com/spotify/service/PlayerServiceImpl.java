@@ -1,19 +1,13 @@
 package com.spotify.service;
 
-import android.util.Log;
-
 import com.spotify.android.appremote.api.PlayerApi;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.android.appremote.api.UserApi;
+import com.spotify.callback.LongCallback;
 import com.spotify.callback.StringCallback;
-import com.spotify.model.Playlist;
-import com.spotify.protocol.client.RemoteClient;
 import com.spotify.protocol.types.Track;
 
 public class PlayerServiceImpl implements PlayerService {
     private final PlayerApi playerService;
-    private String imageUri;
-    private String nameTrack;
 
     public PlayerServiceImpl(SpotifyAppRemote spotifyAppRemote) {
         playerService = spotifyAppRemote.getPlayerApi();
@@ -29,6 +23,14 @@ public class PlayerServiceImpl implements PlayerService {
 
     public void resume() {
         playerService.resume();
+    }
+
+    public void shuffle() {
+        playerService.toggleShuffle();
+    }
+
+    public void repeat() {
+        playerService.toggleRepeat();
     }
 
     @Override
@@ -56,7 +58,7 @@ public class PlayerServiceImpl implements PlayerService {
                 .setEventCallback(playerState -> {
                     final Track track = playerState.track;
                     if (track != null) {
-                        this.imageUri = String.valueOf(track.imageUri);
+                        String imageUri = String.valueOf(track.imageUri);
                         callback.onStringReceived(imageUri);
                     }
                 });
@@ -69,11 +71,51 @@ public class PlayerServiceImpl implements PlayerService {
                 .setEventCallback(playerState -> {
                     final Track track = playerState.track;
                     if (track != null) {
-                        this.nameTrack = track.name;
+                        String nameTrack = track.name;
                         callback.onStringReceived(nameTrack);
                     }
                 });
         }).start();
+    }
+
+    public void getNameArtist(StringCallback callback) {
+        new Thread(() -> {
+            playerService.subscribeToPlayerState()
+                    .setEventCallback(playerState -> {
+                        final Track track = playerState.track;
+                        if (track != null) {
+                            String nameArtist = track.artist.name;
+                            callback.onStringReceived(nameArtist);
+                        }
+                    });
+        }).start();
+    }
+
+    public void getDuration(LongCallback callback){
+        new Thread(() -> {
+            playerService.subscribeToPlayerState()
+                    .setEventCallback(playerState -> {
+                        final Track track = playerState.track;
+                        if (track != null) {
+                            Long seekBar = track.duration;
+                            callback.onLongReceived(seekBar);
+                        }
+                    });
+        }).start();
+    }
+
+    public void getCurrentPlaybackPosition(LongCallback callback) {
+        playerService.subscribeToPlayerState()
+            .setEventCallback(playerState -> {
+                if (playerState != null && playerState.track != null) {
+                    final long playbackPosition = playerState.playbackPosition;
+                    callback.onLongReceived(playbackPosition);
+                }
+            });
+    }
+
+    public void seekTo(Long l) {
+        playerService.seekTo(l);
     }
 
 }
