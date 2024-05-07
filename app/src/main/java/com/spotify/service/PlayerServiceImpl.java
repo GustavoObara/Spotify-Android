@@ -1,9 +1,15 @@
 package com.spotify.service;
 
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
+import android.util.Log;
+
 import com.spotify.android.appremote.api.PlayerApi;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.callback.LongCallback;
 import com.spotify.callback.StringCallback;
+import com.spotify.protocol.client.Subscription;
+import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Track;
 
 public class PlayerServiceImpl implements PlayerService {
@@ -12,7 +18,6 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerServiceImpl(SpotifyAppRemote spotifyAppRemote) {
         playerService = spotifyAppRemote.getPlayerApi();
     }
-
     public void play(String s) {
         playerService.play(s);
     }
@@ -28,10 +33,10 @@ public class PlayerServiceImpl implements PlayerService {
     public void shuffle() {
         playerService.toggleShuffle();
     }
-
     public void repeat() {
         playerService.toggleRepeat();
     }
+
 
     @Override
     public void skipToNext() {
@@ -53,7 +58,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     public void getImage(StringCallback callback) {
-        new Thread(() -> {
+//        new Thread(() -> {
             playerService.subscribeToPlayerState()
                 .setEventCallback(playerState -> {
                     final Track track = playerState.track;
@@ -62,11 +67,11 @@ public class PlayerServiceImpl implements PlayerService {
                         callback.onStringReceived(imageUri);
                     }
                 });
-        }).start();
+//        }).start();
     }
 
     public void getNameTrack(StringCallback callback) {
-        new Thread(() -> {
+//        new Thread(() -> {
             playerService.subscribeToPlayerState()
                 .setEventCallback(playerState -> {
                     final Track track = playerState.track;
@@ -75,11 +80,11 @@ public class PlayerServiceImpl implements PlayerService {
                         callback.onStringReceived(nameTrack);
                     }
                 });
-        }).start();
+//        }).start();
     }
 
     public void getNameArtist(StringCallback callback) {
-        new Thread(() -> {
+//        new Thread(() -> {
             playerService.subscribeToPlayerState()
                     .setEventCallback(playerState -> {
                         final Track track = playerState.track;
@@ -88,11 +93,11 @@ public class PlayerServiceImpl implements PlayerService {
                             callback.onStringReceived(nameArtist);
                         }
                     });
-        }).start();
+//        }).start();
     }
 
     public void getDuration(LongCallback callback){
-        new Thread(() -> {
+//        new Thread(() -> {
             playerService.subscribeToPlayerState()
                     .setEventCallback(playerState -> {
                         final Track track = playerState.track;
@@ -101,17 +106,20 @@ public class PlayerServiceImpl implements PlayerService {
                             callback.onLongReceived(seekBar);
                         }
                     });
-        }).start();
+//        }).start();
     }
 
     public void getCurrentPlaybackPosition(LongCallback callback) {
-        playerService.subscribeToPlayerState()
-            .setEventCallback(playerState -> {
+//        new Thread(() -> {
+            playerService.subscribeToPlayerState()
+                .setEventCallback(playerState -> {
                 if (playerState != null && playerState.track != null) {
-                    final long playbackPosition = playerState.playbackPosition;
+                    final Long playbackPosition = playerState.playbackPosition;
+//                    Log.e("PlayerService", String.valueOf(playbackPosition));
                     callback.onLongReceived(playbackPosition);
                 }
             });
+//        }).start();
     }
 
     public void seekTo(Long l) {

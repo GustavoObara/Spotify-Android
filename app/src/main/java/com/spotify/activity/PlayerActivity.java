@@ -17,7 +17,6 @@ import com.spotify.R;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.callback.LongCallback;
-import com.spotify.callback.StringCallback;
 import com.spotify.service.PlayerService;
 import com.spotify.service.PlayerServiceImpl;
 
@@ -32,7 +31,6 @@ public class PlayerActivity extends AppCompatActivity {
     private ImageView imageTrack;
     private TextView textTrack, textArtist, textDurationState, textDurationMax;
     private SeekBar barTrack;
-
     private FloatingActionButton buttonPrevious, buttonPlayPause, buttonSkip, buttonRandom, buttonRepeat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +68,7 @@ public class PlayerActivity extends AppCompatActivity {
                     switchImageButton(isPlaying);
                     trackDuration(textDurationMax);
                     updateCurrentPosition(textDurationState);
-
+                    seekBarProgress(barTrack);
 
                     buttonSkip.setOnClickListener(v -> {
                         playerService.skipToNext();
@@ -88,36 +86,36 @@ public class PlayerActivity extends AppCompatActivity {
 
                     buttonRepeat.setOnClickListener(v -> playerService.repeat());
 
-                    playerService.getDuration(new LongCallback() {
-                        @Override
-                        public void onLongReceived(Long duration) {
-                            barTrack.setMax(duration.intValue());
-                        }
-                    });
-
-                    new Timer().scheduleAtFixedRate(new TimerTask() {
-                        @Override
-                        public void run() {
-                            seekBarProgress();
-                        }
-                    }, 0, 900);
+                    playerService.getDuration(duration -> barTrack.setMax(duration.intValue()));
 
                     barTrack.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+                            if (fromUser){
+                                updateCurrentPosition(textDurationState, progress);
+                            }
                         }
 
                         @Override
                         public void onStartTrackingTouch(SeekBar seekBar) {
 
                         }
-
                         @Override
                         public void onStopTrackingTouch(SeekBar seekBar) {
-
+                            int progress = seekBar.getProgress();
+                            playerService.seekTo((long) progress);
+                            seekBar.setProgress(progress);
                         }
                     });
+
+                    new Timer().scheduleAtFixedRate(new TimerTask() {
+                        @Override
+                        public void run() {
+//                            seekBarProgress();
+//                            updateCurrentPosition(textDurationState);
+//                            seekBarProgress(barTrack);
+                        }
+                    }, 0, 900);
 
                 }
                 public void onFailure(Throwable throwable) {
@@ -127,39 +125,26 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void trackToTextViewTrack(TextView textTrack) {
-        playerService.getNameTrack(new StringCallback() {
-            @Override
-            public void onStringReceived(String nameTrack) {
-                textTrack.setText(nameTrack);
-            }
+        playerService.getNameTrack(nameTrack -> textTrack.setText(nameTrack));
+    }
+
+    private void trackToTextViewArtist(TextView textArtist) {
+        playerService.getNameArtist(nameTrack -> textArtist.setText(nameTrack));
+    }
+
+    private void urlToImage(ImageView imageView) {
+        playerService.getImage(imageUri -> {
+            String image = extractImageUrl(imageUri);
+            downloadImage(image, imageView);
         });
     }
 
-    private void trackToTextViewArtist(TextView textTrack) {
-        playerService.getNameArtist(new StringCallback() {
-            @Override
-            public void onStringReceived(String nameTrack) {
-                textArtist.setText(nameTrack);
-            }
-        });
-    }
-
-    private void urlToImage(ImageView imageView){
-        playerService.getImage(new StringCallback() {
-            @Override
-            public void onStringReceived(String imageUri) {
-                String image = extractImageUrl(imageUri);
-                downloadImage(image, imageView);
-            }
-        });
-    }
-
-    private String extractImageUrl(String imageUri){
+    private String extractImageUrl(String imageUri) {
         String imageId = imageUri.substring(imageUri.lastIndexOf(":") + 1, imageUri.length() - 2);
         return "https://i.scdn.co/image/" + imageId;
     }
 
-    private void downloadImage(String imageUri, ImageView imageTrack){
+    private void downloadImage(String imageUri, ImageView imageTrack) {
         new Thread(() -> {
             try {
                 URL url = new URL(imageUri);
@@ -185,25 +170,24 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void seekBarProgress(){
-        playerService.getCurrentPlaybackPosition(new LongCallback() {
-            @Override
-            public void onLongReceived(Long playbackPosition) {
-                barTrack.setProgress(playbackPosition.intValue());
-            }
-        });
-    }
+//    private void seekBarProgress() {
+//        new Thread(() -> {
+//            playerService.getCurrentPlaybackPosition(new LongCallback() {
+//                @Override
+//                public void onLongReceived(Long playbackPosition) {
+//                    runOnUiThread(() -> barTrack.setProgress(playbackPosition.intValue()));
+//                }
+//            });
+//        }).start();
+//    }
 
     private void trackDuration(TextView duration){
-        playerService.getDuration(new LongCallback() {
-            @Override
-            public void onLongReceived(Long l) {
-                long totalSeconds = l / 1000; // Convert from ms to seconds
-                long minutes = totalSeconds / 60;
-                long seconds = totalSeconds % 60;
-                String formattedTime = String.format("%02d:%02d", minutes, seconds);
-                duration.setText(formattedTime);
-            }
+        playerService.getDuration(l -> {
+            long totalSeconds = l / 1000;
+            long minutes = totalSeconds / 60;
+            long seconds = totalSeconds % 60;
+            String formattedTime = String.format("%02d:%02d", minutes, seconds);
+            duration.setText(formattedTime);
         });
     }
 
@@ -218,7 +202,27 @@ public class PlayerActivity extends AppCompatActivity {
                 position.setText(formattedTime);
             }
         });
+    }
 
+    private void seekBarProgress(SeekBar barTrack) {
+//        new Thread(() -> {
+            playerService.getCurrentPlaybackPosition(new LongCallback() {
+                @Override
+                public void onLongReceived(Long playbackPosition) {
+//                    runOnUiThread(() -> {
+                        barTrack.setProgress(playbackPosition.intValue());
+//                    });
+                }
+            });
+//        }).start();
+    }
+
+    private void updateCurrentPosition(TextView updateCurrentPosition, long l) {
+        long currentPositionSeconds = l / 1000;
+        long minutes = currentPositionSeconds / 60;
+        long seconds = currentPositionSeconds % 60;
+        String formattedTime = String.format("%02d:%02d", minutes, seconds);
+        updateCurrentPosition.setText(formattedTime);
     }
 
 }

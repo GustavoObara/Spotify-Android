@@ -11,16 +11,16 @@ import com.spotify.R;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.protocol.types.Track;
-import com.spotify.service.PlayerService;
-import com.spotify.service.PlayerServiceImpl;
+//import com.spotify.sdk.android.auth.AuthorizationClient;
+//import com.spotify.sdk.android.auth.AuthorizationRequest;
+//import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 public class LoginActivity extends AppCompatActivity {
 
     static final String CLIENT_ID = "9b29ba638ee846a2b3d5784dabc922f5";
     private static final String REDIRECT_URI = "http://localhost:8080";
+    private static final int REQUEST_CODE = 1337;
     private SpotifyAppRemote appRemote;
-    private PlayerService playerService;
     static ConnectionParams connectionParams = new ConnectionParams.Builder(CLIENT_ID)
             .setRedirectUri(REDIRECT_URI)
             .showAuthView(true)
@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
             new Connector.ConnectionListener() {
             public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                 appRemote = spotifyAppRemote;
-                playerService = new PlayerServiceImpl(appRemote);
+
                 connected();
             }
             public void onFailure(Throwable throwable) {
@@ -57,9 +57,35 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void connected() {
+//        AuthorizationRequest.Builder builder =
+//                new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
+//
+//        builder.setScopes(new String[]{"streaming"});
+//        AuthorizationRequest request = builder.build();
+//
+//        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
         Intent i = new Intent(this, PlayerActivity.class);
         startActivity(i);
         finish();
     }
+
+//    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+//        super.onActivityResult(requestCode, resultCode, intent);
+//
+//        if (requestCode == REQUEST_CODE) {
+//            AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
+//
+//            switch (response.getType()) {
+//                case TOKEN:
+//                    Log.d("LoginActivity", response.getAccessToken());
+//                    break;
+//
+//                case ERROR:
+//                    break;
+//
+//                default:
+//            }
+//        }
+//    }
 
 }
