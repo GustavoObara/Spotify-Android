@@ -113,7 +113,7 @@ public class PlayerActivity extends AppCompatActivity {
                         public void run() {
 //                            seekBarProgress();
 //                            updateCurrentPosition(textDurationState);
-//                            seekBarProgress(barTrack);
+                            seekBarProgress(barTrack);
                         }
                     }, 0, 900);
 
@@ -181,7 +181,7 @@ public class PlayerActivity extends AppCompatActivity {
 //        }).start();
 //    }
 
-    private void trackDuration(TextView duration){
+    private void trackDuration(TextView duration) {
         playerService.getDuration(l -> {
             long totalSeconds = l / 1000;
             long minutes = totalSeconds / 60;
