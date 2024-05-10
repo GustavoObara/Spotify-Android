@@ -51,6 +51,13 @@ dependencies {
     implementation ("com.spotify.android:auth:2.1.1")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
 
+    compileOnly ("org.projectlombok:lombok:1.18.30")
+    annotationProcessor ("org.projectlombok:lombok:1.18.30")
+
+    testCompileOnly ("org.projectlombok:lombok:1.18.30")
+    testAnnotationProcessor ("org.projectlombok:lombok:1.18.30")
+
+
     testImplementation("junit:junit:4.13.2")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

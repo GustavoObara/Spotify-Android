@@ -11,9 +11,13 @@ import android.view.View;
 import com.spotify.R;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.callback.UserCallback;
+import com.spotify.model.User;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
+import com.spotify.service.SpotifyService;
+import com.spotify.service.SpotifyServiceImpl;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -25,13 +29,11 @@ import java.io.IOException;
 public class LoginActivity extends AppCompatActivity {
 
     static final String CLIENT_ID = "9b29ba638ee846a2b3d5784dabc922f5";
-    private static final String REDIRECT_URI = "http://localhost:8080";
-    private static final int REQUEST_CODE = 1337;
-
+    static final String REDIRECT_URI = "http://localhost:8080";
+    static final int REQUEST_CODE = 1337;
     OkHttpClient client = new OkHttpClient();
-
+    private SpotifyService spotifyService;
     String mAccessToken;
-    private SpotifyAppRemote appRemote;
     static ConnectionParams connectionParams = new ConnectionParams.Builder(CLIENT_ID)
             .setRedirectUri(REDIRECT_URI)
             .showAuthView(true)
@@ -41,6 +43,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        spotifyService = new SpotifyServiceImpl();
     }
 
     protected void onStart() {
@@ -60,7 +64,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        SpotifyAppRemote.disconnect(appRemote);
     }
 
     private void connected() {
@@ -76,45 +79,24 @@ public class LoginActivity extends AppCompatActivity {
 
             switch (response.getType()) {
                 case TOKEN:
-                    Log.d("LoginActivity", response.getAccessToken());
-                    Log.e("LoginActivity", "Namoral passei aqui");
                     mAccessToken = response.getAccessToken();
-                    Log.e("LoginActivity", mAccessToken);
-                    final Request request = new Request.Builder()
-                            .url("https://api.spotify.com/v1/me")
-                            .addHeader("Authorization", "Bearer " + mAccessToken)
-                            .build();
-                    Log.e("LoginActivity", String.valueOf(request));
-                    client.newCall(request).enqueue(new Callback() {
+                    spotifyService.getMe(mAccessToken, new UserCallback() {
                         @Override
-                        public void onFailure(Call call, IOException e) {
-                            // Lidar com falha na chamada
-                            e.printStackTrace();
+                        public void onUserReceived(User user) {
+                            Log.e("LoginActivity", user.toString());
                         }
-
                         @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            if (!response.isSuccessful()) {
-                                // Lidar com a resposta não bem-sucedida
-                                throw new IOException("Unexpected code " + response);
-                            } else {
-                                // Lidar com a resposta bem-sucedida
-                                String responseData = response.body().string();
-                                // Faça o que quiser com os dados da resposta
-                                Log.e("LoginActivity", responseData);
-                            }
+                        public void onFailure(Exception e) {
+                            e.printStackTrace();
                         }
                     });
 
                     connected();
                     break;
-
                 case ERROR:
                     break;
-
                 default:
             }
         }
     }
-
 }

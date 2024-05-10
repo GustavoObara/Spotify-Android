@@ -4,15 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+
 import android.util.Log;
+
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import com.spotify.R;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
@@ -36,22 +40,27 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
-        buttonSkip      = (FloatingActionButton) findViewById(R.id.buttonSkip     );
-        buttonRandom    = (FloatingActionButton) findViewById(R.id.buttonRandom   );
-        buttonRepeat    = (FloatingActionButton) findViewById(R.id.buttonRepeat   );
-        buttonPrevious  = (FloatingActionButton) findViewById(R.id.buttonPrevious );
-        buttonPlayPause = (FloatingActionButton) findViewById(R.id.buttonPlayPause);
 
-        barTrack = (SeekBar) findViewById(R.id.seekBarMusic);
+        buttonSkip      = findViewById(R.id.buttonSkip     );
+        buttonRandom    = findViewById(R.id.buttonRandom   );
+        buttonRepeat    = findViewById(R.id.buttonRepeat   );
+        buttonPrevious  = findViewById(R.id.buttonPrevious );
+        buttonPlayPause = findViewById(R.id.buttonPlayPause);
 
-        textTrack         = (TextView) findViewById(R.id.textTrack        );
-        textArtist        = (TextView) findViewById(R.id.textArtist       );
-        textDurationMax   = (TextView) findViewById(R.id.textDurationMax  );
-        textDurationState = (TextView) findViewById(R.id.textDurationState);
+        barTrack = findViewById(R.id.seekBarMusic);
 
-        imageTrack = (ImageView) findViewById(R.id.imageTrack);
+        textTrack         = findViewById(R.id.textTrack        );
+        textArtist        = findViewById(R.id.textArtist       );
+        textDurationMax   = findViewById(R.id.textDurationMax  );
+        textDurationState = findViewById(R.id.textDurationState);
+
+        imageTrack = findViewById(R.id.imageTrack);
 
         start();
+    }
+
+    protected void onStart() {
+        super.onStart();
     }
 
     public void start() {
@@ -111,8 +120,6 @@ public class PlayerActivity extends AppCompatActivity {
                     new Timer().scheduleAtFixedRate(new TimerTask() {
                         @Override
                         public void run() {
-//                            seekBarProgress();
-//                            updateCurrentPosition(textDurationState);
                             seekBarProgress(barTrack);
                         }
                     }, 0, 900);
@@ -170,17 +177,6 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-//    private void seekBarProgress() {
-//        new Thread(() -> {
-//            playerService.getCurrentPlaybackPosition(new LongCallback() {
-//                @Override
-//                public void onLongReceived(Long playbackPosition) {
-//                    runOnUiThread(() -> barTrack.setProgress(playbackPosition.intValue()));
-//                }
-//            });
-//        }).start();
-//    }
-
     private void trackDuration(TextView duration) {
         playerService.getDuration(l -> {
             long totalSeconds = l / 1000;
@@ -205,16 +201,12 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void seekBarProgress(SeekBar barTrack) {
-//        new Thread(() -> {
-            playerService.getCurrentPlaybackPosition(new LongCallback() {
-                @Override
-                public void onLongReceived(Long playbackPosition) {
-//                    runOnUiThread(() -> {
-                        barTrack.setProgress(playbackPosition.intValue());
-//                    });
-                }
-            });
-//        }).start();
+        playerService.getCurrentPlaybackPosition(new LongCallback() {
+            @Override
+            public void onLongReceived(Long playbackPosition) {
+                    barTrack.setProgress(playbackPosition.intValue());
+            }
+        });
     }
 
     private void updateCurrentPosition(TextView updateCurrentPosition, long l) {
