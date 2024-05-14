@@ -2,6 +2,7 @@ package com.spotify.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -35,7 +36,7 @@ public class PlayerActivity extends AppCompatActivity {
     private ImageView imageTrack;
     private TextView textTrack, textArtist, textDurationState, textDurationMax;
     private SeekBar barTrack;
-    private FloatingActionButton buttonPrevious, buttonPlayPause, buttonSkip, buttonRandom, buttonRepeat;
+    private FloatingActionButton buttonPrevious, buttonPlayPause, buttonSkip, buttonRandom, buttonRepeat, buttonHome;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +48,8 @@ public class PlayerActivity extends AppCompatActivity {
         buttonPrevious  = findViewById(R.id.buttonPrevious );
         buttonPlayPause = findViewById(R.id.buttonPlayPause);
 
+        buttonHome      = findViewById(R.id.btnHome);
+
         barTrack = findViewById(R.id.seekBarMusic);
 
         textTrack         = findViewById(R.id.textTrack        );
@@ -55,6 +58,12 @@ public class PlayerActivity extends AppCompatActivity {
         textDurationState = findViewById(R.id.textDurationState);
 
         imageTrack = findViewById(R.id.imageTrack);
+
+        buttonHome.setOnClickListener(v -> {
+            Intent i = new Intent(this, HomeActivity.class);
+            startActivity(i);
+            finish();
+        });
 
         start();
     }
@@ -67,6 +76,7 @@ public class PlayerActivity extends AppCompatActivity {
         SpotifyAppRemote.connect(this, LoginActivity.connectionParams,
             new Connector.ConnectionListener() {
                 public void onConnected(SpotifyAppRemote spotifyAppRemote) {
+
                     playerService = new PlayerServiceImpl(spotifyAppRemote);
 
                     playerService.play("spotify:playlist:6xICZD48qrN2bVbX9Yms9F?si=01869bf4ed2d4171");

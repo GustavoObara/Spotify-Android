@@ -2,11 +2,12 @@ package com.spotify.service;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
-import com.spotify.android.appremote.api.PlayerApi;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.callback.PlaylistCallback;
 import com.spotify.callback.UserCallback;
+import com.spotify.model.Playlist;
 import com.spotify.model.User;
 
 import java.io.IOException;
@@ -30,12 +31,12 @@ public class SpotifyServiceImpl implements SpotifyService {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
 
                 if (!response.isSuccessful()) {
                     throw new IOException("Unexpected code " + response);
@@ -51,8 +52,47 @@ public class SpotifyServiceImpl implements SpotifyService {
         });
     }
 
-    public void getPlaylistsByUserId(String token, String userId, PlaylistCallback callback){
+    public void getPlaylistsByUserId(String token, String userId, PlaylistCallback callback) {
+        Log.e("SpotifyService", token);
+        Log.e("SpotifyService", userId);
 
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/users/" + userId + "/playlists")
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                }
+                String responseData = response.body().string();
+                Gson gson = new Gson();
+                Playlist playlist = gson.fromJson(responseData, Playlist.class);
+                Log.e("SpotifyService", playlist.toString());
+                callback.onPlaylistReceived(playlist);
+            }
+        });
     }
 
 }
+
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+//                if (!response.isSuccessful()) {
+//                    throw new IOException("Unexpected code " + response);
+//                }
+//                // realizar o que fazer com a resposta aqui
+//            }

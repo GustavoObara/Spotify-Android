@@ -1,6 +1,11 @@
 package com.spotify.recycler;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -9,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.spotify.R;
 import com.spotify.model.Playlist;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistHolder> {
@@ -29,8 +36,26 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistHolder> {
     @Override
     public void onBindViewHolder(@NonNull PlaylistHolder holder, int position) {
         Playlist playlist = playlists.get(position);
-        holder.imageView.setImageResource(playlist.getImageResource());
         holder.textViewTitle.setText(playlist.getTitle());
+
+        new Thread(() -> {
+            URL url = null;
+            try {
+                url = new URL(playlist.getImageResource());
+                Log.e("PlaylistAdapter", String.valueOf(url));
+                final Bitmap bmp;
+                bmp = BitmapFactory
+                        .decodeStream(url.openConnection()
+                                .getInputStream());
+                new Handler(Looper.getMainLooper()).post(() ->
+                { holder.imageView.setImageBitmap(bmp);
+                });
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
     }
 
     @Override
