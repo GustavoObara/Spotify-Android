@@ -65,10 +65,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void connected() {
-        Intent i = new Intent(this, PlayerActivity.class);
-//        Intent i = new Intent(this, HomeActivity.class);
-//        i.putExtra("Playlists", (Serializable) playlists);
-//        i.putExtra("Me",        (Serializable) me);
+        Intent i = new Intent(this, HomeActivity.class);
         startActivity(i);
         finish();
     }

@@ -1,14 +1,11 @@
 package com.spotify.model;
 
-import android.util.Log;
-
-import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class Playlist implements Serializable {
+public class Playlist {
     private String href;
     private int limit;
     private String next;
@@ -30,34 +27,7 @@ public class Playlist implements Serializable {
     public Playlist() {
     }
 
-    // Método para obter a primeira PlaylistItem da lista de items
-    public PlaylistItem getFirstPlaylistItem() {
-        if (items != null && !items.isEmpty()) {
-            return items.get(0);
-        }
-        return null;
-    }
 
-    // Implementação de getImageResource() que retorna a primeira imagem da PlaylistItem
-    public String getImageResource() {
-        PlaylistItem firstItem = getFirstPlaylistItem();
-        Log.e("PLAYLIST","Entrei no getImage");
-        if (firstItem != null && firstItem.getImages() != null && !firstItem.getImages().isEmpty()) {
-            Log.e("PLAYLIST","Entrei na condição");
-            return firstItem.getImages().get(0).getUrl();
-        }
-        Log.e("PLAYLIST","Não passei na condição");
-        return null;
-    }
-
-    // Implementação de getTitle() que retorna o nome da PlaylistItem
-    public String getTitle() {
-        PlaylistItem firstItem = getFirstPlaylistItem();
-        if (firstItem != null) {
-            return firstItem.getName();
-        }
-        return null;
-    }
 
     public String getHref() {
         return href;
@@ -110,138 +80,170 @@ public class Playlist implements Serializable {
     public List<PlaylistItem> getItems() {
         return items;
     }
-
     public void setItems(List<PlaylistItem> items) {
         this.items = items;
     }
-}
-@Data
-class PlaylistItem {
-    private boolean collaborative;
-    private String description;
-    private ExternalUrls external_urls;
-    private String href;
-    private String id;
-    private List<Image> images;
-    private String name;
-    private Owner owner;
-    private String primary_color;
-    private boolean isPublic;
-    private String snapshot_id;
-    private Tracks tracks;
 
-    public PlaylistItem(boolean collaborative, String description, ExternalUrls external_urls, String href, String id, List<Image> images, String name, Owner owner, String primary_color, boolean isPublic, String snapshot_id, Tracks tracks) {
-        this.collaborative = collaborative;
-        this.description = description;
-        this.external_urls = external_urls;
-        this.href = href;
-        this.id = id;
-        this.images = images;
-        this.name = name;
-        this.owner = owner;
-        this.primary_color = primary_color;
-        this.isPublic = isPublic;
-        this.snapshot_id = snapshot_id;
-        this.tracks = tracks;
-    }
 
-    public PlaylistItem() {
-    }
+    @Data
+    public class PlaylistItem {
+        private boolean collaborative;
+        private String description;
+        private ExternalUrls external_urls;
+        private String href;
+        private String id;
+        private List<Image> images;
+        private String name;
+        private Owner owner;
+        private String primary_color;
+        private boolean isPublic;
+        private String snapshot_id;
+        private Tracks tracks;
 
-    public boolean isCollaborative() {
-        return collaborative;
-    }
+        public PlaylistItem(boolean collaborative, String description, ExternalUrls external_urls, String href, String id, List<Image> images, String name, Owner owner, String primary_color, boolean isPublic, String snapshot_id, Tracks tracks) {
+            this.collaborative = collaborative;
+            this.description = description;
+            this.external_urls = external_urls;
+            this.href = href;
+            this.id = id;
+            this.images = images;
+            this.name = name;
+            this.owner = owner;
+            this.primary_color = primary_color;
+            this.isPublic = isPublic;
+            this.snapshot_id = snapshot_id;
+            this.tracks = tracks;
+        }
 
-    public void setCollaborative(boolean collaborative) {
-        this.collaborative = collaborative;
-    }
+        public PlaylistItem() {
+        }
 
-    public String getDescription() {
-        return description;
-    }
+        public String getImageResource(int position) {
+            PlaylistItem item = getPlaylistItemByPosition(position);
+            if (item != null && item.getImages() != null && !item.getImages().isEmpty()) {
+                return item.getImages().get(0).getUrl();
+            }
+            return null;
+        }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+        public String getTitle(int position) {
+            PlaylistItem item = getPlaylistItemByPosition(position);
+            if (item != null) {
+                return item.getName();
+            }
+            return null;
+        }
 
-    public ExternalUrls getExternal_urls() {
-        return external_urls;
-    }
+        public PlaylistItem getPlaylistItemByPosition(int position) {
+            if (items != null && !items.isEmpty()) {
+                return items.get(position);
+            }
+            return null;
+        }
 
-    public void setExternal_urls(ExternalUrls external_urls) {
-        this.external_urls = external_urls;
-    }
+        public String getImageUrl() {
+            if (images != null && !images.isEmpty()) {
+                return images.get(0).getUrl();
+            } else {
+                return null;
+            }
+        }
 
-    public String getHref() {
-        return href;
-    }
+        public boolean isCollaborative() {
+            return collaborative;
+        }
 
-    public void setHref(String href) {
-        this.href = href;
-    }
+        public void setCollaborative(boolean collaborative) {
+            this.collaborative = collaborative;
+        }
 
-    public String getId() {
-        return id;
-    }
+        public String getDescription() {
+            return description;
+        }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+        public void setDescription(String description) {
+            this.description = description;
+        }
 
-    public List<Image> getImages() {
-        return images;
-    }
+        public ExternalUrls getExternal_urls() {
+            return external_urls;
+        }
 
-    public void setImages(List<Image> images) {
-        this.images = images;
-    }
+        public void setExternal_urls(ExternalUrls external_urls) {
+            this.external_urls = external_urls;
+        }
 
-    public String getName() {
-        return name;
-    }
+        public String getHref() {
+            return href;
+        }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+        public void setHref(String href) {
+            this.href = href;
+        }
 
-    public Owner getOwner() {
-        return owner;
-    }
+        public String getId() {
+            return id;
+        }
 
-    public void setOwner(Owner owner) {
-        this.owner = owner;
-    }
+        public void setId(String id) {
+            this.id = id;
+        }
 
-    public String getPrimary_color() {
-        return primary_color;
-    }
+        public List<Image> getImages() {
+            return images;
+        }
 
-    public void setPrimary_color(String primary_color) {
-        this.primary_color = primary_color;
-    }
+        public void setImages(List<Image> images) {
+            this.images = images;
+        }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
+        public String getName() {
+            return name;
+        }
 
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
-    }
+        public void setName(String name) {
+            this.name = name;
+        }
 
-    public String getSnapshot_id() {
-        return snapshot_id;
-    }
+        public Owner getOwner() {
+            return owner;
+        }
 
-    public void setSnapshot_id(String snapshot_id) {
-        this.snapshot_id = snapshot_id;
-    }
+        public void setOwner(Owner owner) {
+            this.owner = owner;
+        }
 
-    public Tracks getTracks() {
-        return tracks;
-    }
+        public String getPrimary_color() {
+            return primary_color;
+        }
 
-    public void setTracks(Tracks tracks) {
-        this.tracks = tracks;
+        public void setPrimary_color(String primary_color) {
+            this.primary_color = primary_color;
+        }
+
+        public boolean isPublic() {
+            return isPublic;
+        }
+
+        public void setPublic(boolean aPublic) {
+            isPublic = aPublic;
+        }
+
+        public String getSnapshot_id() {
+            return snapshot_id;
+        }
+
+        public void setSnapshot_id(String snapshot_id) {
+            this.snapshot_id = snapshot_id;
+        }
+
+        public Tracks getTracks() {
+            return tracks;
+        }
+
+        public void setTracks(Tracks tracks) {
+            this.tracks = tracks;
+        }
     }
 }
 

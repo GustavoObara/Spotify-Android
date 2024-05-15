@@ -1,10 +1,11 @@
-package com.spotify;
+package com.spotify.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.spotify.R;
 import com.spotify.activity.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {

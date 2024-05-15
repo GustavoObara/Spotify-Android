@@ -120,15 +120,15 @@ public class HomeActivity extends AppCompatActivity {
 //        Log.e("Home", "to aqui");
 //        Log.e("HomeConnected", String.valueOf(playlists));
 //        Log.e("HomeConnected", String.valueOf(me));
-
-        List<Playlist> playlistList = new ArrayList<>();
-        playlistList.add(playlists);
+//
+//        List<Playlist> playlistList = new ArrayList<>();
+//        playlistList.add(playlists);
 
         recyclerViewPlaylist = findViewById(R.id.recyclerViewPlaylist);
 
-        adapterPlaylist = new PlaylistAdapter(this, playlistList);
+        adapterPlaylist = new PlaylistAdapter(this, playlists.getItems());
 
-        recyclerViewPlaylist.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerViewPlaylist.setLayoutManager(new GridLayoutManager(this, 1));
 
         recyclerViewPlaylist.setAdapter(adapterPlaylist);
     }

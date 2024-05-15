@@ -13,16 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.spotify.R;
 import com.spotify.model.Playlist;
+//import com.spotify.model.Playlist.PlaylistItem;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistHolder> {
-    private List<Playlist> playlists;
+    private List<Playlist.PlaylistItem> playlists;
     private Context context;
 
-    public PlaylistAdapter(Context context, List<Playlist> playlists) {
+    public PlaylistAdapter(Context context, List<Playlist.PlaylistItem> playlists) {
         this.context = context;
         this.playlists = playlists;
     }
@@ -35,27 +36,26 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull PlaylistHolder holder, int position) {
-        Playlist playlist = playlists.get(position);
-        holder.textViewTitle.setText(playlist.getTitle());
+        Playlist.PlaylistItem playlist = playlists.get(position);
+        holder.textViewTitle.setText(playlist.getName());
 
         new Thread(() -> {
             URL url = null;
             try {
-                url = new URL(playlist.getImageResource());
+                url = new URL(playlist.getImageUrl());
                 Log.e("PlaylistAdapter", String.valueOf(url));
                 final Bitmap bmp;
                 bmp = BitmapFactory
                         .decodeStream(url.openConnection()
                                 .getInputStream());
-                new Handler(Looper.getMainLooper()).post(() ->
-                { holder.imageView.setImageBitmap(bmp);
+                new Handler(Looper.getMainLooper()).post(()-> {
+                    holder.imageView.setImageBitmap(bmp);
                 });
             }
             catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }).start();
-
     }
 
     @Override
