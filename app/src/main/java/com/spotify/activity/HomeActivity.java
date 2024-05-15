@@ -30,7 +30,6 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity {
     private RecyclerView recyclerViewPlaylist;
     private PlaylistAdapter adapterPlaylist;
-    private PlayerService playerService;
     private FloatingActionButton buttonPlayer;
     User me = new User();
     Playlist playlists = new Playlist();
@@ -40,8 +39,6 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-//        Intent intent = getIntent();
 
         List<Playlist> playlistList = new ArrayList<>();
         playlistList.add(playlists);
@@ -114,16 +111,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void connected() {
-//        Playlist playlist = (Playlist) intent.getSerializableExtra("Playlists");
-//        User me = (User) intent.getSerializableExtra("Me");
-
-//        Log.e("Home", "to aqui");
-//        Log.e("HomeConnected", String.valueOf(playlists));
-//        Log.e("HomeConnected", String.valueOf(me));
-//
-//        List<Playlist> playlistList = new ArrayList<>();
-//        playlistList.add(playlists);
-
         recyclerViewPlaylist = findViewById(R.id.recyclerViewPlaylist);
 
         adapterPlaylist = new PlaylistAdapter(this, playlists.getItems());

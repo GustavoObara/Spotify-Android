@@ -20,14 +20,10 @@ import com.spotify.sdk.android.auth.AuthorizationResponse;
 import com.spotify.service.SpotifyService;
 import com.spotify.service.SpotifyServiceImpl;
 
-import java.io.Serializable;
-
 public class LoginActivity extends AppCompatActivity {
-
     static final String CLIENT_ID = "9b29ba638ee846a2b3d5784dabc922f5";
     static final String REDIRECT_URI = "http://localhost:8080";
     static final int REQUEST_CODE = 1337;
-//    Intent i = new Intent(this, HomeActivity.class);
     User me = new User();
     Playlist playlists = new Playlist();
     private SpotifyService spotifyService;
@@ -85,8 +81,6 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onPlaylistReceived(Playlist playlist) {
                                     playlists = playlist;
-//                                    i.putExtra("Playlists", playlists);
-//                                    i.putExtra("Me",        me);
                                     Log.e("LoginActivity", playlist.toString());
                                 }
 

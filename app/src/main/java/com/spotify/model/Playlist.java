@@ -27,8 +27,6 @@ public class Playlist {
     public Playlist() {
     }
 
-
-
     public String getHref() {
         return href;
     }
@@ -116,29 +114,6 @@ public class Playlist {
         }
 
         public PlaylistItem() {
-        }
-
-        public String getImageResource(int position) {
-            PlaylistItem item = getPlaylistItemByPosition(position);
-            if (item != null && item.getImages() != null && !item.getImages().isEmpty()) {
-                return item.getImages().get(0).getUrl();
-            }
-            return null;
-        }
-
-        public String getTitle(int position) {
-            PlaylistItem item = getPlaylistItemByPosition(position);
-            if (item != null) {
-                return item.getName();
-            }
-            return null;
-        }
-
-        public PlaylistItem getPlaylistItemByPosition(int position) {
-            if (items != null && !items.isEmpty()) {
-                return items.get(position);
-            }
-            return null;
         }
 
         public String getImageUrl() {

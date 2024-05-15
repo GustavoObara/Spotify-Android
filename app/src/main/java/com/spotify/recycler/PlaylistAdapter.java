@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.spotify.R;
 import com.spotify.model.Playlist;
-//import com.spotify.model.Playlist.PlaylistItem;
 
 import java.io.IOException;
 import java.net.URL;
