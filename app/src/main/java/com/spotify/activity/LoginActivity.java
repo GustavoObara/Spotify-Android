@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         AuthorizationRequest.Builder builder =
                 new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
 
-        builder.setScopes(new String[]{"streaming"});
+        builder.setScopes(new String[]{"streaming", "user-top-read", "app-remote-control"});
         AuthorizationRequest request = builder.build();
 
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
@@ -73,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             switch (response.getType()) {
                 case TOKEN:
                     mAccessToken = response.getAccessToken();
+                    Log.e("LoginToken", mAccessToken);
                     spotifyService.getMe(mAccessToken, new UserCallback() {
                         @Override
                         public void onUserReceived(User user) {

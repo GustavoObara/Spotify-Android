@@ -12,10 +12,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.spotify.R;
 import com.spotify.callback.PlaylistCallback;
+import com.spotify.callback.TopTracksUserCallback;
 import com.spotify.callback.UserCallback;
 import com.spotify.model.Playlist;
+import com.spotify.model.TopTracksUser;
 import com.spotify.model.User;
 import com.spotify.recycler.PlaylistAdapter;
+import com.spotify.recycler.TopTrackAdapter;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -28,11 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
-    private RecyclerView recyclerViewPlaylist;
+    private RecyclerView recyclerViewPlaylist, recyclerViewTopTracks;
     private PlaylistAdapter adapterPlaylist;
+    private TopTrackAdapter adapterTopTrack;
     private FloatingActionButton buttonPlayer;
     User me = new User();
     Playlist playlists = new Playlist();
+    TopTracksUser topTracksUser = new TopTracksUser();
     private SpotifyService spotifyService;
     String mAccessToken;
     @Override
@@ -40,13 +45,14 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        List<Playlist> playlistList = new ArrayList<>();
-        playlistList.add(playlists);
-
-        // Aqui é apenas para instanciar e não dar erro
         recyclerViewPlaylist = findViewById(R.id.recyclerViewPlaylist);
-        recyclerViewPlaylist.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerViewTopTracks = findViewById(R.id.recyclerViewTopTracks);
+
+        recyclerViewPlaylist.setLayoutManager(new GridLayoutManager(this, 1));
+        recyclerViewTopTracks.setLayoutManager(new GridLayoutManager(this, 1));
+
         recyclerViewPlaylist.setAdapter(adapterPlaylist);
+        recyclerViewTopTracks.setAdapter(adapterTopTrack);
 
         buttonPlayer = findViewById(R.id.btnPlayer);
 
@@ -65,7 +71,7 @@ public class HomeActivity extends AppCompatActivity {
         AuthorizationRequest.Builder builder =
                 new AuthorizationRequest.Builder(LoginActivity.CLIENT_ID, AuthorizationResponse.Type.TOKEN, LoginActivity.REDIRECT_URI);
 
-        builder.setScopes(new String[]{"streaming"});
+        builder.setScopes(new String[]{"streaming", "user-top-read", "app-remote-control"});
         AuthorizationRequest request = builder.build();
 
         AuthorizationClient.openLoginActivity(this, LoginActivity.REQUEST_CODE, request);
@@ -87,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
                                 public void onPlaylistReceived(Playlist playlist) {
                                     playlists = playlist;
                                     Log.e("LoginActivity", playlist.toString());
-                                    runOnUiThread(HomeActivity.this::connected);
+                                    runOnUiThread(HomeActivity.this::adapterPlaylist);
                                 }
 
                                 @Override
@@ -102,6 +108,19 @@ public class HomeActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     });
+
+                    spotifyService.getTopTrackUser(mAccessToken, new TopTracksUserCallback() {
+                        @Override
+                        public void onTopTracksUserReceived(TopTracksUser topTrackUser) {
+                            topTracksUser = topTrackUser;
+                            runOnUiThread(HomeActivity.this::adapterTopTracks);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+
+                        }
+                    });
                     break;
                 case ERROR:
                     break;
@@ -110,13 +129,17 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void connected() {
-        recyclerViewPlaylist = findViewById(R.id.recyclerViewPlaylist);
-
+    private void adapterPlaylist() {
         adapterPlaylist = new PlaylistAdapter(this, playlists.getItems());
 
         recyclerViewPlaylist.setLayoutManager(new GridLayoutManager(this, 1));
-
         recyclerViewPlaylist.setAdapter(adapterPlaylist);
+    }
+
+    private void adapterTopTracks() {
+        adapterTopTrack = new TopTrackAdapter(this, topTracksUser.getItems());
+
+        recyclerViewTopTracks.setLayoutManager(new GridLayoutManager(this, 1));
+        recyclerViewTopTracks.setAdapter(adapterTopTrack);
     }
 }

@@ -46,6 +46,8 @@ dependencies {
     implementation ("androidx.appcompat:appcompat:1.6.1")
     implementation ("com.google.code.gson:gson:2.10.1")
 
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+
     implementation (files("../spotify-app-remote-release-0.8.0.aar"))
 
     implementation ("com.spotify.android:auth:2.1.1")
@@ -56,7 +58,6 @@ dependencies {
 
     testCompileOnly ("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor ("org.projectlombok:lombok:1.18.30")
-
 
     testImplementation("junit:junit:4.13.2")
 
